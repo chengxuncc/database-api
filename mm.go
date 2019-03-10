@@ -84,7 +84,7 @@ func main() {
 			query = "select * from goods where name = '"+name+"'"
 		}
 		if barcode_id != ""{
-			query = "select * from goods where name = '"+barcode_id+"'"
+			query = "select * from goods where barcode_id = '"+barcode_id+"'"
 		}
 		if name == ""&&barcode_id == ""{
 			query = "select * from goods"

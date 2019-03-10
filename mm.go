@@ -6,12 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"log"
-	"net/http"
 	"reflect"
 	"strings"
 )
 
 type Goods struct {
+	Id         int
 	Name       string
 	Num        string
 	Im_price   string
@@ -31,7 +31,7 @@ type Response struct {
 	Message string `json:"message"`
 }
 
-func getFieldsValues(obj interface{}) (structname string, field string, value string) {
+func getFieldsValues(obj interface{}) (structname string, field string, value string) {  /*获取类型名等*/
 
 	t := reflect.TypeOf(obj)
 	tv := reflect.ValueOf(obj)
@@ -58,30 +58,54 @@ func getFieldsValues(obj interface{}) (structname string, field string, value st
 func Insert(db *sql.DB, obj interface{}) error {
 	tablename, fields, values := getFieldsValues(obj)
 	sqls := fmt.Sprintf("insert into %s (%s) values (%s)", tablename, fields, values)
-	fmt.Println(sqls)
 	_, err := db.Query(sqls)
 	return err
 }
 
 func main() {
-	db, err := sql.Open("postgres",
+	db, err := sql.Open("postgres",     /*连接数据库*/
 		fmt.Sprintf(
 			"host=%s port=%s user=postgres dbname=%s password=%s sslmode=disable",
-			HOST, PORT, DBNAME, PASSWORD,
+			HOST,PORT,DBNAME,PASSWORD,
 		),
 	)
-	if err != nil {
+	if err != nil {    /*获取连接错误*/
 		log.Panicln("Connect database Error:", err)
 	}
 	router := gin.Default()
-	router.POST("/form_post", func(c *gin.Context) {
 
-		message := c.PostForm("message")
-
-		nick := c.DefaultPostForm("nick", "anonymous")
-
-		c.JSON(http.StatusOK, gin.H{"status": gin.H{"status_code": http.StatusOK, "status": "ok"}, "message": message, "nick": nick,
-		})
+	router.GET("/Goods_query", func(c *gin.Context) {   /*按名字或条形码查询*/
+		var goods []Goods  /*切片*/
+		var good  Goods
+		name := c.Query("name")
+		barcode_id :=c.Query("barcode_id")
+		var query string
+		if name != ""{
+			query = "select * from goods where name = '"+name+"'"
+		}
+		if barcode_id != ""{
+			query = "select * from goods where name = '"+barcode_id+"'"
+		}
+		if name == ""&&barcode_id == ""{
+			c.JSON(200,Response{"REEOR","no parameter for select"})
+			return
+		}
+		Rows,err:= db.Query(query)
+		if err ==nil{
+			if Rows != nil{
+				fmt.Println("OK")
+				for Rows.Next(){
+					err  =Rows.Scan(&good.Id,&good.Name,&good.Num,&good.Im_price,&good.Barcode_id,&good.Discount,&good.Sup_id)
+					goods = append(goods, good)   /*切片增加*/
+				}
+				Rows.Close()
+				if err == nil{
+					c.JSON(200,goods)
+					return
+				}
+			}
+		}
+		c.JSON(200,Response{"error",err.Error()})
 	})
 
 	router.POST("/supplier", func(c *gin.Context) {

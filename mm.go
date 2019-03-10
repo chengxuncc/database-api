@@ -87,8 +87,7 @@ func main() {
 			query = "select * from goods where name = '"+barcode_id+"'"
 		}
 		if name == ""&&barcode_id == ""{
-			c.JSON(200,Response{"REEOR","no parameter for select"})
-			return
+			query = "select * from goods"
 		}
 		Rows,err:= db.Query(query)
 		if err ==nil{

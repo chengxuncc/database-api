@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"reflect"
 	"strings"
@@ -68,6 +69,7 @@ func Insert(db *sql.DB, obj interface{}) error {
 	return err
 }
 
+/*获取结构体各属性指针*/
 func getPointers(obj interface{}) (res []interface{}) {
 	tv := reflect.ValueOf(obj).Elem()
 	fieldNum := tv.NumField()
@@ -75,4 +77,14 @@ func getPointers(obj interface{}) (res []interface{}) {
 		res = append(res, tv.Field(i).Addr().Interface())
 	}
 	return
+}
+
+func remove(c *gin.Context, tb_name string) {
+	id := c.Query("id")
+	_, err := db.Query("update " + tb_name + " set is_delete = true where id = " + id)
+	if err != nil {
+		c.JSON(200, Response{"error", err.Error()})
+	} else {
+		c.JSON(200, Response{"ok", ""})
+	}
 }

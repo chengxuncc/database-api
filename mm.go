@@ -90,6 +90,7 @@ func main() {
 	//	c.JSON(200,Response{"error",err.Error()})
 	//})
 	router.GET("/goods", GoodsGet)
+	router.GET("/goods/:search", GoodsSearch)
 
 	router.POST("/supplier", SupplierCreate)
 	_ = router.Run()

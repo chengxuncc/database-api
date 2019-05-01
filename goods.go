@@ -29,8 +29,30 @@ func GoodsGet(c *gin.Context) {
 			goods = append(goods, aGoods)
 		}
 		c.JSON(200, Response{"ok", goods})
+		_ = rows.Close()
 		return
 	}
-	err = rows.Close()
+	c.JSON(200, Response{"error", err})
+}
+
+func GoodsSearch(c *gin.Context) {
+
+	searchString:=c.Param("search")
+	var goods []Goods /*切片*/
+	var aGoods Goods
+	rows, err := db.Query(`select * from goods where "name" like '%?%' or "barcode_id" like '%?%'`,
+		searchString,searchString)
+	if err == nil {
+		for rows.Next() {
+			e := rows.Scan(getPointers(&aGoods)...)
+			if e != nil {
+				fmt.Println(e)
+			}
+			goods = append(goods, aGoods)
+		}
+		c.JSON(200, Response{"ok", goods})
+		_ = rows.Close()
+		return
+	}
 	c.JSON(200, Response{"error", err})
 }

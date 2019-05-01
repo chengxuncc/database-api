@@ -13,9 +13,14 @@ type Goods struct {
 	Barcode_id string
 	Discount   string
 	Sup_id     string
-	Time       string
+	Add_time   string
+	Upd_time   string
+	Del_time   string
+	Is_delete  bool
+	Price      string
 }
 
+/*获取商品列表*/
 func GoodsGet(c *gin.Context) {
 	var goods []Goods /*切片*/
 	var aGoods Goods
@@ -33,4 +38,24 @@ func GoodsGet(c *gin.Context) {
 	}
 	err = rows.Close()
 	c.JSON(200, Response{"error", err})
+}
+
+/*插入商品信息*/
+func GoodsCreate(c *gin.Context) {
+
+	var o Goods
+	e := c.ShouldBindJSON(&o)
+	if e == nil {
+		e = Insert(db, o)
+		if e == nil {
+			c.JSON(200, Response{"ok", ""})
+			return
+		}
+	}
+	c.JSON(200, Response{"error", e.Error()})
+}
+
+/*商品删除*/
+func GoodsDel(c *gin.Context) {
+	remove(c, "goods")
 }

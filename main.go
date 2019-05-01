@@ -20,7 +20,7 @@ func main() {
 	db, err = sql.Open("postgres", /*连接数据库*/
 		fmt.Sprintf(
 			"host=%s port=%s user=postgres dbname=%s password=%s sslmode=disable",
-			HOST, PORT, DBNAME, PASSWORD,
+			"127.0.0.1", "5432", "postgres", "312030",
 		),
 	)
 	if err != nil { /*获取连接错误*/
@@ -28,34 +28,34 @@ func main() {
 	}
 	router := gin.Default()
 
-	router.GET("/easy_select", func(c *gin.Context) {
-		var goods []Goods /*切片*/
-		var good Goods
-		table_name := c.Query("table_name") /*接收查询的表*/
-		Qualif := c.Query("qualif")         /*接收查询条件*/
-		var query string
-		if Qualif != "" {
-			query = "select * from " + table_name + " where " + Qualif
-		}
-		if Qualif == "" {
-			query = "select * from " + table_name
-		}
-		Rows, err := db.Query(query)
-		if err == nil {
-			if Rows != nil {
-				for Rows.Next() {
-					err = Rows.Scan(&good.Id, &good.Name, &good.Num, &good.Im_price, &good.Barcode_id, &good.Discount, &good.Sup_id)
-					goods = append(goods, good) /*切片增加*/
-				}
-				Rows.Close()
-				if err == nil {
-					c.JSON(200, goods)
-					return
-				}
-			}
-		}
-		c.JSON(200, Response{"error", err.Error()})
-	})
+	//router.GET("/easy_select", func(c *gin.Context) {
+	//	var goods []Goods /*切片*/
+	//	var good Goods
+	//	table_name := c.Query("table_name") /*接收查询的表*/
+	//	Qualif := c.Query("qualif")         /*接收查询条件*/
+	//	var query string
+	//	if Qualif != "" {
+	//		query = "select * from " + table_name + " where " + Qualif
+	//	}
+	//	if Qualif == "" {
+	//		query = "select * from " + table_name
+	//	}
+	//	Rows, err := db.Query(query)
+	//	if err == nil {
+	//		if Rows != nil {
+	//			for Rows.Next() {
+	//				err = Rows.Scan(&good.Id, &good.Name, &good.Num, &good.Im_price, &good.Barcode_id, &good.Discount, &good.Sup_id)
+	//				goods = append(goods, good) /*切片增加*/
+	//			}
+	//			Rows.Close()
+	//			if err == nil {
+	//				c.JSON(200, goods)
+	//				return
+	//			}
+	//		}
+	//	}
+	//	c.JSON(200, Response{"error", err.Error()})
+	//})
 
 	//router.GET("/Goods_query", func(c *gin.Context) {   /*按名字或条形码查询*/
 	//	var goods []Goods  /*切片*/
@@ -89,8 +89,13 @@ func main() {
 	//	}
 	//	c.JSON(200,Response{"error",err.Error()})
 	//})
-	router.GET("/goods", GoodsGet)
+	router.GET("/goodsGet", GoodsGet)
+	router.POST("/goodsAdd", GoodsCreate)
+	router.GET("/goodsDel", GoodsDel)
+
+	router.GET("/eplGet", EmployeeGet)
 
 	router.POST("/supplier", SupplierCreate)
+	router.GET("/supGet", Sups_Get)
 	_ = router.Run()
 }

@@ -17,7 +17,7 @@ type Employee struct {
 	Site       string
 	Entrytime  string
 	Resigntime string
-	Is_resign  bool
+	Is_delete  bool
 }
 
 func EmployeeGet(c *gin.Context) {
@@ -37,4 +37,8 @@ func EmployeeGet(c *gin.Context) {
 	}
 	err = rows.Close()
 	c.JSON(200, Response{"error", err})
+}
+
+func EmployeeRm(c *gin.Context) {
+	remove(c, "employee")
 }

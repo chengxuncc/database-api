@@ -15,6 +15,6 @@ func TestSupplier_Create(t *testing.T) {
 		),
 	)
 	assert.Equal(t, nil, err)
-	err = Insert(db, Supplier{"", "Test_供应商名", "联系方式", "地址", ""})
+	err = Insert(db, Supplier{Id:"", Name:"Test_供应商名", Contact:"联系方式", Address:"地址", Add_time:""})
 	assert.Equal(t, nil, err)
 }

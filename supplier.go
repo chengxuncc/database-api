@@ -18,7 +18,7 @@ type Supplier struct {
 
 /*获取供货商列表*/
 func Sups_Get(c *gin.Context) {
-	var suppliers []Supplier /*切片*/
+	var suppliers []Supplier
 	var asupplier Supplier
 	rows, err := db.Query("select * from supplier")
 	if err == nil {
